@@ -32,7 +32,7 @@ function UserPhotos() {
           <CardMedia
             component="img"
             height="auto"
-            image={`/images/${photo.file_name}`} 
+            image={`/images/${photo.file_name}`} // absolute path to public/images
             alt={`Photo ${photo._id}`}
           />
           <CardContent>

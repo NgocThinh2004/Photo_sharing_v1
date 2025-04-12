@@ -5,10 +5,13 @@ import {
   ListItem,
   ListItemText,
 } from "@mui/material";
-import { Link } from "react-router-dom"; 
+import { Link } from "react-router-dom"; // <-- import Link để điều hướng
 import "./styles.css";
 import models from "../../modelData/models";
 
+/**
+ * Define UserList, a React component of Project 4.
+ */
 function UserList() {
   const users = models.userListModel();
 
@@ -20,7 +23,7 @@ function UserList() {
             <ListItem
               button
               component={Link}
-              to={`/users/${user._id}`} 
+              to={`/users/${user._id}`} // <-- điều hướng đến trang chi tiết user
             >
               <ListItemText primary={`${user.first_name} ${user.last_name}`} />
             </ListItem>
