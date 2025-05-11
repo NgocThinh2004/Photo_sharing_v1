@@ -9,7 +9,7 @@ import UserDetail from "./components/UserDetail";
 import UserList from "./components/UserList";
 import UserPhotos from "./components/UserPhotos";
 import models from './modelData/models';
-
+import UserComments from "./components/UserComments";
 
 const MainLayout = () => {
   const location = useLocation();
@@ -45,6 +45,7 @@ const MainLayout = () => {
         <Grid item sm={9}>
           <Paper className="main-grid-item">
             <Routes>
+              <Route path="/comments/:userId" element={<UserComments />} />
               <Route path="/users/:userId" element={<UserDetail />} />
               <Route path="/photos/:userId" element={<UserPhotos />} />
               <Route path="/users" element={<UserList />} />

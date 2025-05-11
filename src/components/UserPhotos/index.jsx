@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Typography,
   Card,
@@ -8,31 +8,51 @@ import {
   Link,
 } from "@mui/material";
 import { useParams, Link as RouterLink } from "react-router-dom";
-import models from "../../modelData/models";
+import fetchModel from "../../lib/fetchModelData"; // Hàm fetch bạn đã sửa
 import "./styles.css";
 
-/**
- * Define UserPhotos, a React component of Project 4.
- */
 function UserPhotos() {
   const { userId } = useParams();
-  const photos = models.photoOfUserModel(userId);
+  const [photos, setPhotos] = useState([]);
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState(null);
 
-  if (!photos || photos.length === 0) {
+  useEffect(() => {
+    // Fetch user info
+    fetchModel(`/user/${userId}`)
+      .then((data) => setUser(data))
+      .catch((err) => {
+        console.error("Failed to fetch user:", err);
+        setError("Unable to load user.");
+      });
+
+    // Fetch photos
+    fetchModel(`/photosOfUser/${userId}`)
+      .then((data) => setPhotos(data))
+      .catch((err) => {
+        console.error("Failed to fetch photos:", err);
+        setError("Unable to load photos.");
+      });
+  }, [userId]);
+
+  if (error) {
+    return <Typography variant="body1">{error}</Typography>;
+  }
+
+  if (!photos.length) {
     return <Typography variant="body1">No photos found for this user.</Typography>;
   }
 
   return (
     <div className="user-photos">
       <Typography variant="h5" gutterBottom>
-        Photos of {models.userModel(userId).first_name}
+        Photos of {user ? user.first_name : "Loading..."}
       </Typography>
       {photos.map((photo) => (
         <Card key={photo._id} sx={{ marginBottom: 4 }}>
           <CardMedia
             component="img"
-            height="auto"
-            image={`/images/${photo.file_name}`} // absolute path to public/images
+            image={`/images/${photo.file_name}`}
             alt={`Photo ${photo._id}`}
           />
           <CardContent>
@@ -40,15 +60,14 @@ function UserPhotos() {
               Taken on: {new Date(photo.date_time).toLocaleString()}
             </Typography>
 
-            {/* Hiển thị bình luận */}
-            {photo.comments && photo.comments.length > 0 ? (
+            {photo.comments?.length > 0 ? (
               <>
                 <Divider sx={{ marginTop: 2, marginBottom: 1 }} />
                 <Typography variant="subtitle2" gutterBottom>
                   Comments:
                 </Typography>
-                {photo.comments.map((comment) => (
-                  <div key={comment._id} style={{ marginBottom: "8px" }}>
+                {photo.comments.map((comment, idx) => (
+                  <div key={idx} style={{ marginBottom: "8px" }}>
                     <Typography variant="body2">
                       <Link component={RouterLink} to={`/users/${comment.user._id}`}>
                         {comment.user.first_name} {comment.user.last_name}

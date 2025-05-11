@@ -1,18 +1,32 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Typography, Link } from "@mui/material";
-import { useParams, Link as RouterLink } from "react-router-dom"; // dùng RouterLink để điều hướng
-import models from "../../modelData/models";
+import { useParams, Link as RouterLink } from "react-router-dom";
+import fetchModel from "../../lib/fetchModelData";
 import "./styles.css";
 
-/**
- * Define UserDetail, a React component of Project 4.
- */
 function UserDetail() {
-  const { userId } = useParams(); // lấy userId từ URL
-  const user = models.userModel(userId); // lấy dữ liệu người dùng
+  const { userId } = useParams();
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchModel(`/user/${userId}`)
+      .then((data) => {
+        setUser(data);
+        setError(null);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch user:", err);
+        setError("User not found or error fetching data.");
+      });
+  }, [userId]);
+
+  if (error) {
+    return <Typography variant="body1">{error}</Typography>;
+  }
 
   if (!user) {
-    return <Typography variant="body1">User not found.</Typography>;
+    return <Typography variant="body1">Loading...</Typography>;
   }
 
   return (
